@@ -3,35 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doces Da Clara - Faça seu Pedido</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-pink-50 min-h-screen text-gray-800 font-sans">
+    <title>Doceria Delícia - Cardápio</title>
 
-    <header class="bg-white shadow-md py-6 mb-8 border-b-4 border-pink-400">
-        <div class="container mx-auto text-center">
-            <h1 class="text-4xl font-extrabold text-pink-600 tracking-wide">🧁Doces Da Clara 🧁</h1>
-            <p class="text-gray-500 mt-2 text-sm sm:text-base">Escolha seus doces favoritos e finalize no WhatsApp</p>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonte Google: Quicksand (Arredondada e amigável, perfeita para doces) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fdf2f8; /* Fundo rosa bem clarinho (pink-50) */
+        }
+
+        /* Oculta barra de rolagem no carrinho, mas mantém a funcionalidade */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-gray-700 antialiased">
+
+    <!-- Cabeçalho (Header) -->
+    <header class="bg-white shadow-[0_4px_20px_-10px_rgba(236,72,153,0.3)] pt-10 pb-8 mb-10 rounded-b-[40px] border-b-2 border-pink-100">
+        <div class="container mx-auto text-center px-4">
+            <h1 class="text-5xl font-bold text-pink-500 tracking-tight mb-2">
+                <span class="text-3xl">✨</span> Doceria Delícia <span class="text-3xl">✨</span>
+            </h1>
+            <p class="text-pink-400 font-semibold text-lg">Os doces mais gostosos, feitos com amor!</p>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 max-w-7xl pb-16">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="container mx-auto px-4 max-w-7xl pb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
+            <!-- 🧁 VITRINE DE PRODUTOS 🧁 -->
             <div class="lg:col-span-2">
-                <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b-2 border-pink-200 pb-2">Nosso Cardápio</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="flex items-center space-x-3 mb-8">
+                    <span class="text-3xl">🍰</span>
+                    <h2 class="text-3xl font-bold text-gray-800">Nosso Cardápio</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     {% for produto in produtos %}
-                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-pink-100 flex flex-col justify-between">
-                        <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover">
-                        <div class="p-5 flex-grow flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800 mb-2">{{ produto.nome }}</h3>
-                                <p class="text-pink-600 font-extrabold text-xl mb-4">R$ {{ "%.2f"|format(produto.preco) }}</p>
+                    <!-- Cartão do Produto -->
+                    <div class="bg-white rounded-[32px] shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(236,72,153,0.4)] transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-pink-50 flex flex-col">
+
+                        <!-- Imagem -->
+                        <div class="relative">
+                            <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" class="w-full h-56 object-cover rounded-t-[32px]">
+                            <!-- Badge de Preço em cima da imagem -->
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-sm text-pink-600 font-bold text-lg">
+                                R$ {{ "%.2f"|format(produto.preco) }}
                             </div>
+                        </div>
+
+                        <!-- Informações do Produto -->
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <h3 class="font-bold text-xl text-gray-800 mb-6 text-center">{{ produto.nome }}</h3>
+
                             <a href="{{ url_for('adicionar_ao_carrinho', produto_id=produto.id) }}"
-                               class="block text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200">
-                                Adicionar ao Carrinho
+                               class="block w-full text-center bg-pink-100 text-pink-600 hover:bg-pink-500 hover:text-white font-bold py-3 px-6 rounded-full transition-colors duration-300">
+                                + Adicionar ao Carrinho
                             </a>
                         </div>
                     </div>
@@ -39,86 +79,97 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-pink-100 p-6 h-fit sticky top-6">
-                <div class="flex justify-between items-center mb-6 border-b pb-3">
-                    <h2 class="text-2xl font-bold text-gray-700">Seu Carrinho</h2>
-                    {% if carrinho %}
-                    <a href="{{ url_for('limpar_carrinho') }}" class="text-xs text-red-500 hover:underline">Limpar tudo</a>
-                    {% endif %}
-                </div>
+            <!-- 🛒 CARRINHO E CHECKOUT 🛒 -->
+            <div class="lg:col-span-1">
+                <!-- Cartão Flutuante do Carrinho -->
+                <div class="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(236,72,153,0.12)] border border-pink-50 p-8 sticky top-8">
 
-                {% if not carrinho %}
-                <div class="text-center py-8 text-gray-400">
-                    <p class="text-lg">🛒 Seu carrinho está vazio.</p>
-                    <p class="text-sm mt-1">Adicione alguns doces ao lado!</p>
-                </div>
-                {% else %}
+                    <div class="flex justify-between items-end mb-6 border-b-2 border-pink-100 pb-4">
+                        <h2 class="text-2xl font-bold text-pink-500 flex items-center gap-2">
+                            <span>🛍️</span> Seu Pedido
+                        </h2>
+                        {% if carrinho %}
+                        <a href="{{ url_for('limpar_carrinho') }}" class="text-sm text-gray-400 hover:text-red-500 transition-colors">Limpar</a>
+                        {% endif %}
+                    </div>
 
-                <div class="space-y-4 mb-6 max-h-60 overflow-y-auto pr-1">
-                    {% for item in carrinho %}
-                    <div class="flex justify-between items-center bg-pink-50/50 p-3 rounded-xl border border-pink-100/50">
-                        <div class="flex-1 pr-2">
-                            <p class="font-semibold text-sm text-gray-800">{{ item.nome }}</p>
-                            <p class="text-xs text-gray-500">R$ {{ "%.2f"|format(item.preco) }} cada</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-sm font-bold bg-white px-2.5 py-1 rounded-md border text-gray-700">{{ item.quantidade }}x</span>
-                            <div class="flex flex-col space-y-1">
-                                <a href="{{ url_for('adicionar_ao_carrinho', produto_id=item.id) }}" class="text-xs bg-gray-200 hover:bg-pink-200 px-1.5 py-0.5 rounded text-center font-bold">+</a>
-                                <a href="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" class="text-xs bg-gray-200 hover:bg-red-200 px-1.5 py-0.5 rounded text-center font-bold">-</a>
+                    {% if not carrinho %}
+                    <div class="text-center py-10">
+                        <div class="text-6xl mb-4 opacity-50">🛒</div>
+                        <p class="text-xl font-semibold text-gray-400">O carrinho está vazio!</p>
+                        <p class="text-gray-400 mt-2">Que tal adicionar um docinho?</p>
+                    </div>
+                    {% else %}
+
+                    <!-- Lista de Itens do Carrinho -->
+                    <div class="space-y-4 mb-8 max-h-64 overflow-y-auto no-scrollbar">
+                        {% for item in carrinho %}
+                        <div class="flex justify-between items-center bg-pink-50/50 p-4 rounded-2xl border border-pink-100/50">
+                            <div class="flex-1 pr-3">
+                                <p class="font-bold text-gray-700 leading-tight mb-1">{{ item.nome }}</p>
+                                <p class="text-sm font-semibold text-pink-500">R$ {{ "%.2f"|format(item.preco) }}</p>
+                            </div>
+
+                            <div class="flex items-center space-x-3 bg-white px-2 py-1.5 rounded-full shadow-sm border border-pink-50">
+                                <a href="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" class="w-6 h-6 flex items-center justify-center rounded-full text-pink-400 hover:bg-pink-100 font-bold transition-colors">-</a>
+                                <span class="text-sm font-bold text-gray-700 w-4 text-center">{{ item.quantidade }}</span>
+                                <a href="{{ url_for('adicionar_ao_carrinho', produto_id=item.id) }}" class="w-6 h-6 flex items-center justify-center rounded-full text-pink-400 hover:bg-pink-100 font-bold transition-colors">+</a>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+
+                    <!-- Total -->
+                    <div class="bg-pink-50 p-4 rounded-2xl mb-6 flex justify-between items-center">
+                        <span class="font-bold text-gray-600">Total a pagar:</span>
+                        <span class="text-2xl font-bold text-pink-600">R$ {{ "%.2f"|format(total) }}</span>
+                    </div>
+
+                    <!-- Formulário -->
+                    <form action="{{ url_for('finalizar_pedido') }}" method="POST" class="space-y-4">
+                        <div>
+                            <input type="text" name="nome" required placeholder="Seu nome completo"
+                                   class="w-full px-5 py-3 bg-gray-50 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 outline-none transition-all">
+                        </div>
+
+                        <div>
+                            <select name="pagamento" required class="w-full px-5 py-3 bg-gray-50 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 outline-none transition-all text-gray-600 appearance-none">
+                                <option value="" disabled selected>Forma de pagamento...</option>
+                                <option value="Pix">Pix</option>
+                                <option value="Cartão">Cartão (Crédito/Débito)</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <select name="entrega" id="entrega" required onchange="toggleEndereco()"
+                                    class="w-full px-5 py-3 bg-gray-50 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 outline-none transition-all text-gray-600 appearance-none">
+                                <option value="" disabled selected>Como quer receber?</option>
+                                <option value="Retirada">Retirar na Doceria</option>
+                                <option value="Entrega">Receber em casa (Delivery)</option>
+                            </select>
+                        </div>
+
+                        <div id="campo-endereco" class="hidden transition-all duration-300">
+                            <textarea name="endereco" id="input-endereco" placeholder="Endereço (Rua, Número, Bairro, Complemento)" rows="2"
+                                      class="w-full px-5 py-3 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"></textarea>
+                        </div>
+
+                        <!-- Botão do WhatsApp (Verde tradicional, mas com estilo arredondado para combinar) -->
+                        <button type="submit"
+                                class="w-full mt-6 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 rounded-full shadow-[0_4px_15px_rgba(37,211,102,0.4)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-2 text-lg">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                            <span>Enviar Pedido</span>
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
-
-                <div class="border-t border-b py-3 mb-6 flex justify-between items-center font-bold text-lg text-gray-800">
-                    <span>Total:</span>
-                    <span class="text-pink-600 text-xl">R$ {{ "%.2f"|format(total) }}</span>
-                </div>
-
-                <form action="{{ url_for('finalizar_pedido') }}" method="POST" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Seu Nome *</label>
-                        <input type="text" name="nome" required placeholder="Digite seu nome completo"
-                               class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Forma de Pagamento *</label>
-                        <select name="pagamento" required class="w-full px-4 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400">
-                            <option value="Pix">Pix</option>
-                            <option value="Cartão de Crédito/Débito">Cartão de Crédito/Débito</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Modo de Entrega *</label>
-                        <select name="entrega" id="entrega" required onchange="toggleEndereco()"
-                                class="w-full px-4 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400">
-                            <option value="Retirada">Vou retirar no local</option>
-                            <option value="Entrega">Quero que entregue</option>
-                        </select>
-                    </div>
-
-                    <div id="campo-endereco" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Endereço de Entrega *</label>
-                        <textarea name="endereco" id="input-endereco" placeholder="Rua, número, bairro e complemento" rows="2"
-                                  class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400"></textarea>
-                    </div>
-
-                    <button type="submit"
-                            class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2 text-lg">
-                        <span>Enviar Pedido ao WhatsApp</span>
-                    </button>
-                </form>
-                {% endif %}
             </div>
 
         </div>
     </main>
 
+    <!-- Script de controle do formulário -->
     <script>
         function toggleEndereco() {
             const selectEntrega = document.getElementById('entrega');
