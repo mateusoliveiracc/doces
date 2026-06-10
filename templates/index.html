@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doces Da Clara - Faça seu Pedido</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-50 min-h-screen text-gray-800 font-sans">
+
+    <header class="bg-white shadow-md py-6 mb-8 border-b-4 border-pink-400">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl font-extrabold text-pink-600 tracking-wide">🧁Doces Da Clara 🧁</h1>
+            <p class="text-gray-500 mt-2 text-sm sm:text-base">Escolha seus doces favoritos e finalize no WhatsApp</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-7xl pb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b-2 border-pink-200 pb-2">Nosso Cardápio</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {% for produto in produtos %}
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-pink-100 flex flex-col justify-between">
+                        <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover">
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800 mb-2">{{ produto.nome }}</h3>
+                                <p class="text-pink-600 font-extrabold text-xl mb-4">R$ {{ "%.2f"|format(produto.preco) }}</p>
+                            </div>
+                            <a href="{{ url_for('adicionar_ao_carrinho', produto_id=produto.id) }}"
+                               class="block text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200">
+                                Adicionar ao Carrinho
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg border border-pink-100 p-6 h-fit sticky top-6">
+                <div class="flex justify-between items-center mb-6 border-b pb-3">
+                    <h2 class="text-2xl font-bold text-gray-700">Seu Carrinho</h2>
+                    {% if carrinho %}
+                    <a href="{{ url_for('limpar_carrinho') }}" class="text-xs text-red-500 hover:underline">Limpar tudo</a>
+                    {% endif %}
+                </div>
+
+                {% if not carrinho %}
+                <div class="text-center py-8 text-gray-400">
+                    <p class="text-lg">🛒 Seu carrinho está vazio.</p>
+                    <p class="text-sm mt-1">Adicione alguns doces ao lado!</p>
+                </div>
+                {% else %}
+
+                <div class="space-y-4 mb-6 max-h-60 overflow-y-auto pr-1">
+                    {% for item in carrinho %}
+                    <div class="flex justify-between items-center bg-pink-50/50 p-3 rounded-xl border border-pink-100/50">
+                        <div class="flex-1 pr-2">
+                            <p class="font-semibold text-sm text-gray-800">{{ item.nome }}</p>
+                            <p class="text-xs text-gray-500">R$ {{ "%.2f"|format(item.preco) }} cada</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-bold bg-white px-2.5 py-1 rounded-md border text-gray-700">{{ item.quantidade }}x</span>
+                            <div class="flex flex-col space-y-1">
+                                <a href="{{ url_for('adicionar_ao_carrinho', produto_id=item.id) }}" class="text-xs bg-gray-200 hover:bg-pink-200 px-1.5 py-0.5 rounded text-center font-bold">+</a>
+                                <a href="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" class="text-xs bg-gray-200 hover:bg-red-200 px-1.5 py-0.5 rounded text-center font-bold">-</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="border-t border-b py-3 mb-6 flex justify-between items-center font-bold text-lg text-gray-800">
+                    <span>Total:</span>
+                    <span class="text-pink-600 text-xl">R$ {{ "%.2f"|format(total) }}</span>
+                </div>
+
+                <form action="{{ url_for('finalizar_pedido') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Seu Nome *</label>
+                        <input type="text" name="nome" required placeholder="Digite seu nome completo"
+                               class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Forma de Pagamento *</label>
+                        <select name="pagamento" required class="w-full px-4 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400">
+                            <option value="Pix">Pix</option>
+                            <option value="Cartão de Crédito/Débito">Cartão de Crédito/Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Modo de Entrega *</label>
+                        <select name="entrega" id="entrega" required onchange="toggleEndereco()"
+                                class="w-full px-4 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400">
+                            <option value="Retirada">Vou retirar no local</option>
+                            <option value="Entrega">Quero que entregue</option>
+                        </select>
+                    </div>
+
+                    <div id="campo-endereco" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Endereço de Entrega *</label>
+                        <textarea name="endereco" id="input-endereco" placeholder="Rua, número, bairro e complemento" rows="2"
+                                  class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400"></textarea>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2 text-lg">
+                        <span>Enviar Pedido ao WhatsApp</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function toggleEndereco() {
+            const selectEntrega = document.getElementById('entrega');
+            const campoEndereco = document.getElementById('campo-endereco');
+            const inputEndereco = document.getElementById('input-endereco');
+
+            if (selectEntrega.value === 'Entrega') {
+                campoEndereco.classList.remove('hidden');
+                inputEndereco.required = true;
+            } else {
+                campoEndereco.classList.add('hidden');
+                inputEndereco.required = false;
+                inputEndereco.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
