@@ -6,7 +6,7 @@ app.secret_key = 'chave_secreta_super_segura_para_doceria'
 
 # Substitua pelo número do WhatsApp do vendedor (com DDD, apenas números)
 # Exemplo: 5531999999999
-NUMERO_WHATSAPP = "31994645249"
+NUMERO_WHATSAPP = "31990641603"
 
 # Simulação de um banco de dados de produtos
 PRODUTOS = [
